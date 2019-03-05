@@ -26,5 +26,5 @@ print(armstrong(7))
 
 end = "--- %s seconds ---" % (time.time() - start)
 
-print("Koniec")
+print("END")
 print(end)
