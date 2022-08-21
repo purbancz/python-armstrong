@@ -1,9 +1,4 @@
 from itertools import combinations_with_replacement, permutations
-import time
-
-
-start = time.time()
-
 
 def armstrong(ran):
     results = []
@@ -23,8 +18,3 @@ def armstrong(ran):
     return sorted(results)
 
 print(armstrong(7))
-
-end = "--- %s seconds ---" % (time.time() - start)
-
-print("END")
-print(end)
