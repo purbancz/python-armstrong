@@ -1,3 +1,4 @@
+# mailto: p.m.urbanczyk@gmail.com
 from itertools import combinations_with_replacement
 from multiprocessing import Pool
 
@@ -27,7 +28,9 @@ def armstrong(ran):
     with Pool() as pool:
         for i in range(1, ran+1):
             # Use a pool of workers to check the combinations in parallel
-            for result in pool.starmap(check_comb, [(comb, i, powers) for comb in combinations_with_replacement(range(10), i)]):
+            # Use chunks to reduce overhead
+            chunksize = 1000
+            for result in pool.starmap(check_comb, [(comb, i, powers) for comb in combinations_with_replacement(range(10), i)], chunksize=chunksize):
                 if result is not None:
                     results.add(result)
 
