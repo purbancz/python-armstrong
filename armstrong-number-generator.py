@@ -1,40 +1,36 @@
 # mailto: p.m.urbanczyk@gmail.com
 from itertools import combinations_with_replacement
 from multiprocessing import Pool
+from numba import njit
 
 
-def check_comb(comb, i, powers):
-    combval = [powers[i][n] for n in comb]
-    sum_combval = sum(combval)
-    max_sum = 9**i * i
+@njit
+def check_comb(comb, i, powers, max_sum):
+    sum_combval = sum(powers[i][n] for n in comb)
 
     if sum_combval > max_sum:
         return None
 
-    sumalist = tuple(map(int, str(sum_combval)))
-
-    # Sort sumalist and the combination and check if they're equal
-    if tuple(sorted(comb)) == tuple(sorted(sumalist)):
+    sumalist = tuple(sorted(map(int, str(sum_combval))))
+    
+    if tuple(sorted(comb)) == sumalist:
         return sum_combval
 
     return None
 
 def armstrong(ran):
-    # Precompute the ith power of all digits from 0 to 9
     powers = [[n**i for n in range(10)] for i in range(ran+1)]
-    
+    max_sums = [9**i * i for i in range(ran+1)]
     results = set()
 
     with Pool() as pool:
         for i in range(1, ran+1):
-            # Use a pool of workers to check the combinations in parallel
-            # Use chunks to reduce overhead
-            chunksize = 1000
-            for result in pool.starmap(check_comb, [(comb, i, powers) for comb in combinations_with_replacement(range(10), i)], chunksize=chunksize):
+            combinations_gen = combinations_with_replacement(range(10), i)
+            for result in pool.starmap(check_comb, ((comb, i, powers, max_sums[i]) for comb in combinations_gen), chunksize=1000):
                 if result is not None:
                     results.add(result)
 
-    return sorted(list(results))
+    return sorted(results)
 
 # Run the program to find Armstrong numbers with n digits
 if __name__ == '__main__':

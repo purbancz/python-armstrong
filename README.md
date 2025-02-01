@@ -1,8 +1,10 @@
 # Armstrong (narcissistic) numbers generator
 
+[![github](https://img.shields.io/badge/GitHub-purbancz-181717.svg?style=flat&logo=github)](https://github.com/purbancz) [![twitter](https://img.shields.io/badge/Twitter-@purbancz-00aced.svg?style=flat&logo=twitter)](https://twitter.com/purbancz) [![website](https://img.shields.io/badge/Website-Piotr_Urbańczyk-5087B2.svg?style=flat&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4IiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik0gMTIgMi4wOTk2MDk0IEwgMSAxMiBMIDQgMTIgTCA0IDIxIEwgMTAgMjEgTCAxMCAxNCBMIDE0IDE0IEwgMTQgMjEgTCAyMCAyMSBMIDIwIDEyIEwgMjMgMTIgTCAxMiAyLjA5OTYwOTQgeiIgZmlsbD0iI2ZmZiI+PC9wYXRoPgo8L3N2Zz4=)](https://www.copernicuscenter.edu.pl/en/person/urbanczyk-piotr-2/)
+
 This Python script is designed to find [Armstrong (narcissistic) numbers](https://en.wikipedia.org/wiki/Narcissistic_number) up to a range of $10^n$, where $n$ is a parameter of the `armstrong()` function.
 
-In essence, this script uses a multiset approach (implemented via combination with replacement).
+In essence, this script uses a multiset approach (implemented *via* combination with replacement) for time optimization.
 
 ---
 
@@ -10,9 +12,9 @@ In essence, this script uses a multiset approach (implemented via combination wi
 
 1. **Precomputing**: The `powers` list precomputes the `i`th power of all digits from 0 to 9 for `i` in the range `ran+1`. This avoids having to compute these powers repeatedly for each combination.
 
-2. **Combinations with replacement**: The `combinations_with_replacement` function from the `itertools` module generates all combinations of a certain size from the digits 0 to 9, allowing each digit to be used more than once. This significantly reduces the search space compared to generating all permutations of the digits.
+2. **Combinations with replacement/multiset approach**: The `combinations_with_replacement` function from the `itertools` module generates all combinations of a certain size from the digits 0 to 9, allowing each digit to be used more than once. This significantly reduces the search space compared to generating all permutations of the digits.
 
-3. **Checking sums early**: The code calculates the sum of the `i`th powers of the digits in a combination (`combval`) and checks if this sum is greater than `9**i * i`. If it is, it skips to the next combination. This avoids unnecessary computations for combinations that cannot possibly form an Armstrong number.
+3. **Early exit**: The code calculates the sum of the `i`th powers of the digits in a combination (`combval`) and checks if this sum is greater than `9**i * i`. If it is, it skips to the next combination. This avoids unnecessary computations for combinations that cannot possibly form an Armstrong number.
 
 4. **Sorting and comparing tuples**: The code converts the sum of `combval` into a tuple of its digits (`sumalist`), sorts both `sumalist` and the combination, and checks if they're equal. This is a more efficient way to check if a combination forms an Armstrong number compared to generating all permutations of the combination.
 
@@ -21,7 +23,11 @@ In essence, this script uses a multiset approach (implemented via combination wi
 6. **Multiprocessing**: The code uses Python's multiprocessing module to parallelize the computation across multiple cores, which can significantly speed up the computation for larger values.
 
 ---
+
+### Execution time
+
 Example run times of the script for a given range on a low-tier machine (Intel(R) Core(TM) i5-6400 CPU @ 2.70GHz, 32 GB RAM):
+
 | $n$ as of $10^n$ range of search | execution time [in seconds] |
 |--|--|
 | 1 | 0.20598888397216797
@@ -44,12 +50,14 @@ Example run times of the script for a given range on a low-tier machine (Intel(R
 | 24 | 446.1013534069061
 | 25 | 646.2790954113007
 | 27 | 1464.0623307228088
-<!-- | 29 | ???
+<!--
+| 29 | ???
 | 31 | ??? ~3h?
-| 32 | ???
+| 32 | ??? run
 | 33 | ???
 | 34 | ???
 | 35 | ??? 
 | 37 | ???
 | 38 | ???
-| 39 | ??? -->
+| 39 | ???
+-->
