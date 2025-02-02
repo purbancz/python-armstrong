@@ -3,6 +3,7 @@
 #include <set>
 #include <algorithm>
 #include <chrono>
+#include <omp.h>
 
 using namespace std;
 using ull = unsigned long long;
@@ -86,14 +87,14 @@ vector<ull> armstrong(int ran) {
         }
     }
     
-    set<ull> results;
+    // Global results set (will be merged from each thread's local results)
+    set<ull> global_results;
     
-    // For each digit-length i, generate all non-decreasing sequences of i digits.
+    // Parallelize the outer loop over digit lengths (i).
+    #pragma omp parallel for schedule(dynamic)
     for (int i = 1; i <= ran; i++) {
-        // Upper bound: i * (9^i)
+        // Compute bounds for this digit-length.
         ull upper_bound = i * powers[i][9];
-        
-        // Lower bound: for i > 1, lower_bound = 10^(i-1); for i==1, no lower bound.
         ull lower_bound = (i == 1) ? 0 : 1;
         if (i > 1) {
             for (int j = 0; j < i - 1; j++) {
@@ -101,17 +102,26 @@ vector<ull> armstrong(int ran) {
             }
         }
         
+        // Each thread maintains its own local results.
+        set<ull> local_results;
         vector<int> comb;
-        process_combinations(i, 0, comb, i, powers, upper_bound, lower_bound, results);
+        process_combinations(i, 0, comb, i, powers, upper_bound, lower_bound, local_results);
+        
+        // Merge the local results into the global results using a critical section.
+        #pragma omp critical
+        {
+            global_results.insert(local_results.begin(), local_results.end());
+        }
     }
     
-    vector<ull> sorted_results(results.begin(), results.end());
+    // Transfer global results into a sorted vector.
+    vector<ull> sorted_results(global_results.begin(), global_results.end());
     sort(sorted_results.begin(), sorted_results.end());
     return sorted_results;
 }
 
 int main() {
-    int ran = 17; // Maximum number of digits to consider.
+    int ran = 21; // Maximum number of digits to consider.
     
     auto start_time = chrono::high_resolution_clock::now();
     vector<ull> numbers = armstrong(ran);
